@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego Rítmico de Luces</title>
+    <!-- CDN para Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- GSAP para animaciones -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
+    <!-- Howler.js para sonidos -->
+    <script src="https://cdn.jsdelivr.net/npm/howler@2.2.3/dist/howler.min.js"></script>
+    <style>
+        body { background-color: #000; overflow: hidden; margin: 0; }
+        .light { position: absolute; border-radius: 50%; opacity: 0.8; }
+    </style>
+</head>
+<body>
+    <div id="gameContainer" class="w-full h-screen relative overflow-hidden"></div>
+    <button id="startButton" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 text-white px-6 py-3 rounded-lg text-xl">Jugar</button>
+
+    <script>
+        const gameContainer = document.getElementById('gameContainer');
+        const startButton = document.getElementById('startButton');
+        let score = 0;
+
+        // Configuración de la música con Howler.js
+        const music = new Howl({
+            src: ['https://www.mfiles.co.uk/mp3-downloads/Toccata-and-Fugue-Dm.mp3'],
+            autoplay: false,
+            loop: true,
+            volume: 0.7
+        });
+
+        startButton.addEventListener('click', () => {
+            startButton.style.display = 'none';
+            music.play();
+            startGame();
+        });
+
+        function startGame() {
+            setInterval(spawnLight, 500);
+        }
+
+        function spawnLight() {
+            const light = document.createElement('div');
+            light.className = 'light';
+            const size = Math.random() * 50 + 50;
+            light.style.width = light.style.height = `${size}px`;
+            light.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            light.style.left = `${Math.random() * window.innerWidth}px`;
+            light.style.top = `${Math.random() * window.innerHeight}px`;
+            gameContainer.appendChild(light);
+
+            gsap.fromTo(light, { opacity: 0, scale: 0 }, {
+                opacity: 1,
+                scale: 1,
+                duration: 0.5,
+                onComplete: () => {
+                    gsap.to(light, {
+                        opacity: 0,
+                        scale: 2,
+                        duration: 1,
+                        onComplete: () => gameContainer.removeChild(light)
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+</html>
